@@ -1,5 +1,7 @@
 package org.hibernate.bugs;
 
+import java.time.Instant;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -9,30 +11,42 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * This template demonstrates how to develop a test case for Hibernate ORM, using the Java Persistence API.
+ * This template demonstrates how to develop a test case for Hibernate ORM,
+ * using the Java Persistence API.
  */
 public class JPAUnitTestCase {
 
-	private EntityManagerFactory entityManagerFactory;
+    private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void init() {
-		entityManagerFactory = Persistence.createEntityManagerFactory( "templatePU" );
-	}
+    @After
+    public void destroy() {
+        this.entityManagerFactory.close();
+    }
 
-	@After
-	public void destroy() {
-		entityManagerFactory.close();
-	}
+    @Before
+    public void init() {
+        this.entityManagerFactory = Persistence.createEntityManagerFactory("templatePU");
+    }
 
-	// Entities are auto-discovered, so just add them anywhere on class-path
-	// Add your tests, using standard JUnit.
-	@Test
-	public void hhh123Test() throws Exception {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		entityManager.getTransaction().begin();
-		// Do stuff...
-		entityManager.getTransaction().commit();
-		entityManager.close();
-	}
+    @Test
+    public void testInstantMax() throws Exception {
+        EntityManager entityManager = this.entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        User user = new User();
+        user.setInstant(Instant.MAX);
+        entityManager.persist(user);
+        entityManager.getTransaction().commit();
+        entityManager.close();
+    }
+
+    @Test
+    public void testInstantMin() throws Exception {
+        EntityManager entityManager = this.entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        User user = new User();
+        user.setInstant(Instant.MIN);
+        entityManager.persist(user);
+        entityManager.getTransaction().commit();
+        entityManager.close();
+    }
 }
